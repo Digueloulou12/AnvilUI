@@ -47,17 +47,19 @@ class AnvilForms
     {
         $config = new Config(AnvilMain::getInstance()->getDataFolder() . "config.yml", Config::YAML);
         $form = new CustomForm(function (Player $player, array $data = null) use ($config) {
-            if ($data[1] === null) {
+            if ($data === null) {
                 $player->sendMessage($config->get("rename_null"));
-            } else {
-                if ($player->getXpManager()->getXpLevel() >= $config->get("xp_rename")) {
-                    $item = $player->getInventory()->getItemInHand();
-                    $item->setCustomName($data[1]);
-                    $player->getInventory()->setItemInHand($item);
-                    $player->getXpManager()->subtractXpLevels($config->get("xp_rename"));
-                    $player->sendMessage(str_replace(strtolower("{name}"), $data[1], $config->get("rename_good")));
-                } else $player->sendMessage($config->get("no_xp_rename"));
+                return;
             }
+            
+            if ($player->getXpManager()->getXpLevel() >= $config->get("xp_rename")) {
+                $item = $player->getInventory()->getItemInHand();
+                $item->setCustomName($data[1]);
+                $player->getInventory()->setItemInHand($item);
+                $player->getXpManager()->subtractXpLevels($config->get("xp_rename"));
+                $player->sendMessage(str_replace(strtolower("{name}"), $data[1], $config->get("rename_good")));
+            } else $player->sendMessage($config->get("no_xp_rename"));
+
         });
         $form->setTitle($config->get("rename")["title"]);
         $form->addLabel($config->get("rename")["content"]);
